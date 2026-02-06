@@ -27,6 +27,14 @@ namespace QuizBackend.Controllers
             return await _context.Results.ToListAsync();
         }
 
+        // GET: api/Results/latest10
+        [HttpGet("latest10")]
+        public async Task<ActionResult<IEnumerable<Result>>> GetLatest10Results()
+        {
+            return await _context.Results.OrderByDescending(r => r.Id).Take(10).ToListAsync();
+        }
+
+
         // GET: api/Results/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Result>> GetResult(int id)
