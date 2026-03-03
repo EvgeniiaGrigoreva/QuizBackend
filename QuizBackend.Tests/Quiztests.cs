@@ -25,8 +25,8 @@ namespace QuizBackend.Tests
 
             Result result = new Result();
             result.CorAnswer = 15;
-            result.Date = DateTime.Now;
-                                 
+           // result.Date = DateTime.FromDateTime(DateTime.Now);
+
             string input = JsonConvert.SerializeObject(result);
             StringContent content = new StringContent(input, Encoding.UTF8, "application/json");
 
