@@ -41,6 +41,23 @@ namespace QuizBackend.Controllers
             return quiz;
         }
 
+        // GET: api/Quizs/by-userid
+        [HttpGet("by-userid/{id}")]
+        public async Task<ActionResult<Quiz>> GetQuizzesName(int id)
+        {
+            var results = await _context.Quizzes
+                .Where(q => q.UserId == id)
+                .Select(q => new{
+                    QuizId = q.QuizId,
+                    QuizName = q.QuizName
+                }).ToListAsync();
+
+            if (id == 0)
+                return NotFound();
+
+            return Ok(results);
+        }
+
         // PUT: api/Quizs/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
