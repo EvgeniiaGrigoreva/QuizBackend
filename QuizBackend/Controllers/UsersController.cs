@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using QuizBackend.Models;
 
 namespace QuizBackend.Controllers
@@ -27,21 +28,19 @@ namespace QuizBackend.Controllers
             return await _context.Users.ToListAsync();
         }
 
-
-
-        // GET: api/Users/by-login/admin
-        [HttpGet("by-login/{login}")]
-        public async Task<ActionResult<int>> GetUserID(string login)
+        // POST: api/Users/login
+        [HttpPost("login")]
+        public async Task<ActionResult<UserResponse>> Post([FromBody] User loginData)
         {
-            var user = await _context.Users
-                .Where(u => u.Login == login)
-                .Select(u => u.UserId)
-                .FirstOrDefaultAsync();
+            var user = await _context.Users.FirstOrDefaultAsync
+                (u => u.Login == loginData.Login && u.Password == loginData.Password);
 
-            if (user == 0)
+            if (user == null)
+            {
                 return NotFound();
+            }
 
-            return Ok(user);
+            return Ok(new UserResponse { UserId = user.UserId, Login = user.Login});
         }
 
         // GET: api/Users/5
@@ -59,7 +58,6 @@ namespace QuizBackend.Controllers
         }
 
         // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUser(int id, User user)
         {
@@ -92,12 +90,16 @@ namespace QuizBackend.Controllers
         // POST: api/Users
         
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserResponse>> PostUser(User user)
         {
+            if (user == null) {
+                return BadRequest();
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetUser", new { id = user.UserId }, user);
+            return Ok(new UserResponse { UserId = user.UserId, Login = user.Login });
         }
 
         // DELETE: api/Users/5
@@ -120,5 +122,7 @@ namespace QuizBackend.Controllers
         {
             return _context.Users.Any(e => e.UserId == id);
         }
+
+
     }
 }

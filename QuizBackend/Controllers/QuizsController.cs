@@ -59,7 +59,6 @@ namespace QuizBackend.Controllers
         }
 
         // PUT: api/Quizs/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuiz(int id, Quiz quiz)
         {
@@ -99,17 +98,20 @@ namespace QuizBackend.Controllers
             return CreatedAtAction("GetQuiz", new { id = quiz.QuizId }, quiz);
         }
 
-        // DELETE: api/Quizs/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteQuiz(int id)
+        // DELETE: api/Quizs
+        [HttpDelete]
+        public async Task<IActionResult> DeleteQuiz(List<int> ids)
         {
-            var quiz = await _context.Quizzes.FindAsync(id);
-            if (quiz == null)
+            var quizzes = await _context.Quizzes.Where(q => ids.Contains(q.QuizId))
+        .ToListAsync();
+
+            if (!quizzes.Any())
             {
                 return NotFound();
             }
 
-            _context.Quizzes.Remove(quiz);
+            _context.Quizzes.RemoveRange(quizzes);
+            
             await _context.SaveChangesAsync();
 
             return NoContent();

@@ -13,8 +13,9 @@ public partial class Quiz
 
     public int UserId { get; set; }
 
-    public string? QuizName { get; set; }
-     
+    [StringLength(200)]
+    public string QuizName { get; set; } = null!;
+
     [InverseProperty("Quiz")]
     public virtual ICollection<Question> Questions { get; set; } = new List<Question>();
 

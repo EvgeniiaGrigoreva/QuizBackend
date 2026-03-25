@@ -11,12 +11,14 @@ public partial class Answer
     [Key]
     public int AnswerId { get; set; }
 
+    public int QuestionId { get; set; }
+
+    [StringLength(500)]
     public string AnswerText { get; set; } = null!;
 
     public bool IsCorrect { get; set; }
 
-    public int QuestionId { get; set; }  
-
     [ForeignKey("QuestionId")]
+    [InverseProperty("Answers")]
     public virtual Question Question { get; set; } = null!;
 }

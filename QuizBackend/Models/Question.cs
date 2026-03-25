@@ -14,7 +14,6 @@ public partial class Question
     [StringLength(500)]
     public string QuestionText { get; set; } = null!;
 
-
     public int? QuizId { get; set; }
 
     [InverseProperty("Question")]

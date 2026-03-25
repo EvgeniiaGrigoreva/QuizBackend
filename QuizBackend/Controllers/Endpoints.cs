@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using QuizBackend.Models;
-using System.Text.Json;
 
 namespace QuizBackend.Controllers
 {
@@ -34,6 +31,7 @@ namespace QuizBackend.Controllers
             public string AnsFalse2 { get; set; }
         }
 
+
         [HttpPost("savelist")]
         public async Task<IActionResult> SaveList([FromBody] CreateQuiz items)
         {
@@ -42,7 +40,7 @@ namespace QuizBackend.Controllers
                 return BadRequest("The list is empty.");
             }
 
-          
+
             var quiz = new Quiz
             {
                 UserId = items.UserID,
@@ -54,9 +52,9 @@ namespace QuizBackend.Controllers
                 var question = new Question
                 {
                     QuestionText = q.Text,
-                                       
+
                 };
-                
+
                 quiz.Questions.Add(question);
                 question.Answers.Add(new Answer { AnswerText = q.AnsTrue, IsCorrect = true });
                 question.Answers.Add(new Answer { AnswerText = q.AnsFalse1, IsCorrect = false });
@@ -69,4 +67,5 @@ namespace QuizBackend.Controllers
             return Ok("Quiz received correctly");
         }
     }
-    }
+
+}

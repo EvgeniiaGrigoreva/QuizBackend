@@ -11,7 +11,7 @@ public partial class Result
     [Key]
     public int Id { get; set; }
 
-    public DateTime Date { get; set; }
+    public DateOnly Date { get; set; }
 
     public int CorAnswer { get; set; }
 

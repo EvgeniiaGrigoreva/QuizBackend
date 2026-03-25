@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Mvc;
+using QuizBackend.Controllers;
 
 
 
@@ -13,59 +15,49 @@ namespace QuizBackend.Tests
 {
     [TestClass]
 
-   
-    public class Quiztests
+
+    public class UsersControllerTests
     {
-        [TestMethod]
-        public async Task TestResultAdd()
+        private AppDbContext GetMemoryContext()
         {
+            // Создаем уникальное имя базы для каждого теста, чтобы они не мешали друг другу
+            var options = new DbContextOptionsBuilder<AppDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
 
-            WebApplicationFactory<Program> application = new WebApplicationFactory<Program>();
-            HttpClient client = application.CreateClient();
-
-            Result result = new Result();
-            result.CorAnswer = 15;
-           // result.Date = DateTime.FromDateTime(DateTime.Now);
-
-            string input = JsonConvert.SerializeObject(result);
-            StringContent content = new StringContent(input, Encoding.UTF8, "application/json");
-
-            var responsePost = await client.PostAsync("api/Results", content);
-
-            Assert.AreEqual("Created", responsePost.StatusCode.ToString());
-
-        }
-        [TestMethod]
-        public async Task TestResultGetId5()
-        {
-            var app = new WebApplicationFactory<Program>();
-            var client = app.CreateClient();
-
-            var getResponse = await client.GetAsync("api/Results/5");
-            Assert.AreEqual(HttpStatusCode.OK, getResponse.StatusCode);
+            return new AppDbContext(options);
         }
 
-            [TestMethod]
-        public async Task TestResultDeleteAllWithCorAnswer15()
+        [TestMethod]
+        public async Task PostUser_ReturnsBadRequest_WhenUserIsNull()
         {
-            var app = new WebApplicationFactory<Program>();
-            var client = app.CreateClient();
-                      
-            var getResponse = await client.GetAsync("api/Results");
-            getResponse.EnsureSuccessStatusCode();
+            // 1. Arrange (Подготовка)
+            var db = GetMemoryContext();
+            var controller = new UsersController(db);
 
-            var json = await getResponse.Content.ReadAsStringAsync();
-            var results = JsonConvert.DeserializeObject<List<Result>>(json);
+            // 2. Act (Действие)
+            var result = await controller.PostUser(null);
 
-            
-            var toDelete = results.Where(r => r.CorAnswer == 15).ToList();
+            // 3. Assert (Проверка)
+            // Мы ожидаем, что вернется BadRequest, так как в коде стоит if (user == null)
+            Assert.IsInstanceOfType(result.Result, typeof(BadRequestResult));
+        }
 
-            
-            foreach (var r in toDelete)
-            {
-                var deleteResponse = await client.DeleteAsync($"api/Results/{r.Id}");
-                Assert.AreEqual(HttpStatusCode.NoContent, deleteResponse.StatusCode);
-            }
+        [TestMethod]
+        public async Task PostUser_AddsUserToDb_WhenDataIsValid()
+        {
+            // Arrange
+            var db = GetMemoryContext();
+            var controller = new UsersController(db);
+            var testUser = new User { UserId = 1, Login = "Student", Password = "123" };
+
+            // Act
+            await controller.PostUser(testUser);
+
+            // Assert
+            // Проверяем, что в нашей "памяти" теперь реально лежит 1 пользователь
+            var count = await db.Users.CountAsync();
+            Assert.AreEqual(1, count);
         }
     }
-}
+    }

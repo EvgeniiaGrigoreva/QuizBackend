@@ -46,6 +46,29 @@ namespace QuizBackend.Controllers
             return answer;
         }
 
+        // GET: api/Answers/by-quizid/5
+        [HttpGet("by-quizid/{id}")]
+        public async Task<ActionResult<IEnumerable<Answer>>> GetAnswersByQuizId(int id)
+        {
+            if (id == 0)
+                return NotFound();
+
+            var result = await _context.Answers
+                .Where(a => a.Question.QuizId == id)
+                .Select(a => new
+                {
+                    AnswerId = a.AnswerId,
+                    QuestionId = a.QuestionId,
+                    AnswerText = a.AnswerText,
+                    IsCorrect = a.IsCorrect
+                })
+                .ToListAsync();
+
+            return Ok(result);
+        }
+
+
+
         // PUT: api/Answers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
