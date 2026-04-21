@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizBackend.Models;
 
@@ -27,6 +22,19 @@ namespace QuizBackend.Controllers
             return await _context.Quizzes.ToListAsync();
         }
 
+        // GET: api/Quizs/list
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<QuizList>>> GetListQuizzes()
+        {
+            return await _context.Quizzes
+         .Select(q => new QuizList
+         {
+             QuizId = q.QuizId,
+             QuizName = q.QuizName,
+         }) 
+         .ToListAsync();
+        }
+
         // GET: api/Quizs/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Quiz>> GetQuiz(int id)
@@ -47,7 +55,8 @@ namespace QuizBackend.Controllers
         {
             var results = await _context.Quizzes
                 .Where(q => q.UserId == id)
-                .Select(q => new{
+                .Select(q => new
+                {
                     QuizId = q.QuizId,
                     QuizName = q.QuizName
                 }).ToListAsync();
@@ -111,7 +120,7 @@ namespace QuizBackend.Controllers
             }
 
             _context.Quizzes.RemoveRange(quizzes);
-            
+
             await _context.SaveChangesAsync();
 
             return NoContent();

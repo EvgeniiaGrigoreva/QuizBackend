@@ -40,7 +40,6 @@ namespace QuizBackend.Controllers
                 return BadRequest("The list is empty.");
             }
 
-
             var quiz = new Quiz
             {
                 UserId = items.UserID,

@@ -1,9 +1,5 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using QuizBackend.Controllers;
 using QuizBackend.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 

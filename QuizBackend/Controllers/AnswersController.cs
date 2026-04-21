@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizBackend.Models;
@@ -50,27 +46,18 @@ namespace QuizBackend.Controllers
         [HttpGet("by-quizid/{id}")]
         public async Task<ActionResult<IEnumerable<Answer>>> GetAnswersByQuizId(int id)
         {
-            if (id == 0)
-                return NotFound();
+            if (id <= 0)
+                return BadRequest();
 
             var result = await _context.Answers
                 .Where(a => a.Question.QuizId == id)
-                .Select(a => new
-                {
-                    AnswerId = a.AnswerId,
-                    QuestionId = a.QuestionId,
-                    AnswerText = a.AnswerText,
-                    IsCorrect = a.IsCorrect
-                })
+                .Select(a => new { a.AnswerId, a.QuestionId, a.AnswerText, a.IsCorrect })
                 .ToListAsync();
 
             return Ok(result);
         }
 
-
-
         // PUT: api/Answers/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAnswer(int id, Answer answer)
         {

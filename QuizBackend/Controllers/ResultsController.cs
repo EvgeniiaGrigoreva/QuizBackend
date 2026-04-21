@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizBackend.Models;
 
@@ -29,12 +24,20 @@ namespace QuizBackend.Controllers
 
         // GET: api/Results/latest10
         [HttpGet("latest10")]
-        public async Task<ActionResult<IEnumerable<Result>>> GetLatest10Results()
+        public async Task<ActionResult<IEnumerable<ResultItems>>> GetLatest10Results()
         {
-            return await _context.Results.
-                Include(r => r.Quiz).
-                OrderByDescending(r => r.Id).
-                Take(10).ToListAsync();
+            var results = await _context.Results
+        .Include(r => r.Quiz)
+        .OrderByDescending(r => r.Id)
+        .Take(10)
+        .Select(r => new ResultItems
+        {
+            Id = r.Id,
+            CorAnswer = r.CorAnswer,
+            Date = r.Date,
+            QuizName = r.Quiz.QuizName
+        }).ToListAsync();
+            return results;
         }
 
 
@@ -53,7 +56,6 @@ namespace QuizBackend.Controllers
         }
 
         // PUT: api/Results/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutResult(int id, Result result)
         {
@@ -84,7 +86,6 @@ namespace QuizBackend.Controllers
         }
 
         // POST: api/Results
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Result>> PostResult(Result result)
         {

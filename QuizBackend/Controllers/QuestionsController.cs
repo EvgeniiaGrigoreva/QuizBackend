@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuizBackend.Models;
 
@@ -45,17 +39,18 @@ namespace QuizBackend.Controllers
 
         // GET: api/Questions/by-quizid
         [HttpGet("by-quizid/{id}")]
-        public async Task<ActionResult<Question>> GetQuestionByQuizId(int id)
+        public async Task<IActionResult> GetQuestionByQuizId(int id)
         {
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
             var result = await _context.Questions.
                 Where(q => q.QuizId == id)
-                .Select(q => new
-                {
-                    QuestionId = q.QuestionId,
-                    QuestionText = q.QuestionText
-                }).ToListAsync();
-
-            if (id == 0)
+                .Select(q => new { q.QuestionId, q.QuestionText })
+                .ToListAsync();
+                       
+            if (result == null || !result.Any())
             {
                 return NotFound();
             }
@@ -64,7 +59,7 @@ namespace QuizBackend.Controllers
         }
 
         // PUT: api/Questions/5
-        
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutQuestion(int id, Question question)
         {
@@ -95,7 +90,7 @@ namespace QuizBackend.Controllers
         }
 
         // POST: api/Questions
-     
+
         [HttpPost]
         public async Task<ActionResult<Question>> PostQuestion(Question question)
         {
