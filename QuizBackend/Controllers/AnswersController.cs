@@ -49,7 +49,7 @@ namespace QuizBackend.Controllers
             if (id <= 0)
                 return BadRequest();
 
-            var result = await _context.Answers
+            var result = await _context.Answers  
                 .Where(a => a.Question.QuizId == id)
                 .Select(a => new { a.AnswerId, a.QuestionId, a.AnswerText, a.IsCorrect })
                 .ToListAsync();
